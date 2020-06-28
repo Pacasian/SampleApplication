@@ -2,18 +2,22 @@ package com.example.sampleapplication;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -31,7 +35,9 @@ public class NotificationService extends Service {
     int GrievanceVer=0;
     int[] Increment=new int[]{};
     String msg;
-
+public static final String CHANNEL_1_ID="channel1";
+    public static final String CHANNEL_2_ID="channel2";
+    private NotificationManagerCompat notificationManager;
     Timer timer;
     TimerTask timerTask;
     String TAG = "Timers";
@@ -57,7 +63,8 @@ public class NotificationService extends Service {
     @Override
     public void onCreate() {
         Log.e(TAG, "onCreate");
-
+        addNotify();
+        notificationManager= NotificationManagerCompat.from(this);
 
     }
 
@@ -127,11 +134,33 @@ public class NotificationService extends Service {
                             {
                                 MailVer=MailCount;
                                 msg="New Mail ";
+                                Intent intent = new Intent(NotificationService.this, SampleMailActivity.class);
+                                PendingIntent contentIntent = PendingIntent.getActivity(NotificationService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                                Notification notification1= new NotificationCompat.Builder(NotificationService.this,CHANNEL_1_ID)
+                                        .setSmallIcon(R.drawable.ic_baseline_notifications_active_24)
+                                        .setContentTitle("New Mail")
+                                        .setContentText("You have received new Mail.....")
+                                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                                        .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                                        .setContentIntent(contentIntent)
+                                        .build();
+                                notificationManager.notify(1,notification1);
                             }if ((GrievanceVer!=GrievanceCount)){
                                 GrievanceVer=GrievanceCount;
                                 msg=msg+"  New Grievance ";
+                                Intent intent = new Intent(NotificationService.this, SampleGrievanceActivity.class);
+                                PendingIntent contentIntent2 = PendingIntent.getActivity(NotificationService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                                Notification notification2= new NotificationCompat.Builder(NotificationService.this,CHANNEL_2_ID)
+                                .setSmallIcon(R.drawable.ic_baseline_notifications_active_24)
+                                .setContentTitle("New Grievance")
+                                .setContentText("You have received new Grievance.....")
+                                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                                        .setContentIntent(contentIntent2)
+                                        .build();
+                                notificationManager.notify(2,notification2);
                             }
-                            addNotification();
+                            //addNotification();
                             String st=MainActivity.sd;
                             Toast.makeText(NotificationService.this,st , Toast.LENGTH_SHORT).show();
                         }
@@ -159,6 +188,24 @@ public class NotificationService extends Service {
 
         NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(1, b.build());
+    }
+
+    public void addNotify(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel1=new NotificationChannel(
+                    CHANNEL_1_ID,"dhum",NotificationManager.IMPORTANCE_HIGH
+            );
+            channel1.setDescription("channel1");
+            NotificationChannel channel2=new NotificationChannel(
+                    CHANNEL_2_ID,"dhum 2",NotificationManager.IMPORTANCE_HIGH
+            );
+            channel2.setDescription("channel2");
+            NotificationManager manager=getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(channel1);
+            manager.createNotificationChannel(channel2);
+
+
+        }
     }
     public class CheckTables extends AsyncTask<String, String, String> {
         String z = "";

@@ -20,7 +20,7 @@ public class DatabaseConnection extends Activity {
     {
         String ip ;
 
-        ip = "60.243.14.236";
+        ip = "192.168.1.4";
         //sharedInfo.get("ip");
         System.out.println("------------------------");
         System.out.println(ip+"in DatabaseClass");

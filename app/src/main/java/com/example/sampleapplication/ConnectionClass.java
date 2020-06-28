@@ -14,8 +14,8 @@ public class ConnectionClass extends Activity {
 
 
 
-    String ip="60.243.14.236";
-    //String ip = "192.168.1.4";
+    //String ip="60.243.14.236";
+    String ip = "192.168.1.4";
     String Classes = "net.sourceforge.jtds.jdbc.Driver";
     String db = "testDatabase";
     String un = "test";
